@@ -15,8 +15,7 @@ from toc import (
 from utils import save_results
 
 
-def get_dataset(args):
-    def get_dataset():
+def get_dataset():
     data_path = os.path.join("complexwebquestions_V1_1/ComplexWebQuestions_dev.json")
     data = json.load(open(data_path))
     print(data[1])
