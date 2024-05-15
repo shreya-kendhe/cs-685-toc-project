@@ -1,17 +1,20 @@
 import numpy as np
 import dsp
 
-
+#Retrieves passages relevant to the current question in dev from colbert and return top-k
 def retrieve(query: str, k: int) -> list[str]:
     """Retrieves passages from the RM for the query and returns the top k passages."""
     if not dsp.settings.rm:
         raise AssertionError("No RM is loaded.")
+    #Call to ColBert returns a dict probably relevant to the passages, next step creates a list of the "long_text"
     passages = dsp.settings.rm(query, k=k)
     passages = [psg.long_text for psg in passages]
     
     if dsp.settings.reranker:
+        #Gets top-k from SentenceBert, returns list of indexes of k-most relevant passages in passages
         passages_cs_scores = dsp.settings.reranker(query, passages)
         passages_cs_scores_sorted = np.argsort(passages_cs_scores)[::-1]
+        #keeps only the top-k indexes in passages
         passages = [passages[idx] for idx in passages_cs_scores_sorted]
 
     return passages
