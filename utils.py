@@ -4,12 +4,13 @@ import json
 def save_results(args, data, preds, outputs):
     preds_w_ids = {}
     outputs_w_ids = {}
-    for idx, (id, entry) in enumerate(data['dev'].items()):
+    for idx in range(len(data)):
+        d = data[idx]
         if idx >= len(preds):
             break
         
-        preds_w_ids[id] = preds[idx]
-        outputs_w_ids[id] = outputs[idx]
+        preds_w_ids[d['ID']] = preds[idx]
+        outputs_w_ids[d['ID']] = outputs[idx]
         
     os.makedirs(args.output_dir, exist_ok=True)
     

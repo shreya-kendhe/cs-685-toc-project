@@ -51,7 +51,7 @@ def get_dataset_ASQA():
         }
 
         str_disambigs = make_str_disambig(ins['qa_pairs'])
-        entry.update({'subques' : str_disambigs})
+        entry.update({'disambig' : str_disambigs})
 
         qa_pairs["train"] += [entry]
 
@@ -61,7 +61,7 @@ def get_dataset_ASQA():
 
 def get_example(args, train, ins, passages,
                 reranker=None, consolidation=False):
-
+    # print(ins)
     question = ins.question
     with dsp.settings.context(vectorizer=dsp.SentenceTransformersVectorizer()):
         #indexes all train dicts
@@ -83,7 +83,7 @@ def get_example(args, train, ins, passages,
 
     #not sure what this is, where does ins.disambig come from no key named disambig in the dataset
     if consolidation:
-        dic_example.update({'subques' : ins.disambig})
+        dic_example.update({'disambig' : ins.disambig})
 
     #returns some datatype representing the context and the n shots
     example = dsp.Example(**dic_example)
@@ -99,7 +99,7 @@ def QD_predict(example: dsp.Example, qd_template,
 
     kw_out = {
             'answer': completions.answer,
-            'subques': completions.disambig,
+            'disambig': completions.disambig,
     }
 
     out_example = example.copy(**kw_out)
@@ -151,24 +151,24 @@ def get_argparser():
     # parser.add_argument("--data_name", default="ASQA.json", type=str, help="The input data name.")
     parser.add_argument("--bing_path", default=None, type=str, help="The bing data path.")
     parser.add_argument("--prefix", default='', type=str, help="The prefix of output files.")
-    parser.add_argument("--model_type", default='text-davinci-003', type=str, help="The GPT model type.")
-    # parser.add_argument("--openai_key",  default='', type=str, required=True, help="The openai key.")
+    parser.add_argument("--model_type", default='davinci-002', type=str, help="The GPT model type.")
+    parser.add_argument("--openai_key",  default="", type=str, required=False, help="The openai key.")
     # parser.add_argument("--colbert_url", default='', type=str,required=True, help= "The colbert server url.")
     parser.add_argument("--temperature", default=0.7, type=float, help="The temperature for generation.")
-    parser.add_argument("--n_shot", default=5, type=int, help="The number of few-shot examples for in-context learning.")
+    parser.add_argument("--n_shot", default=3, type=int, help="The number of few-shot examples for in-context learning.")
     parser.add_argument("--n_dev", default=-1, type=int, help="The number of dev examples to run.")
-    parser.add_argument("--max_nodes", default=10, type=int, help="The maximum number of nodes in a tree.")
+    parser.add_argument("--max_nodes", default=5, type=int, help="The maximum number of nodes in a tree.")
     parser.add_argument("--max_depth", default=3, type=int, help="The maximum depth of a tree.")
     parser.add_argument("--max_trials", default=3, type=int, help="The maximum number of restarts.")
     parser.add_argument("--top_k_docs", default=100, type=int, help="The maximum number of retrieved documents.")
     parser.add_argument("--top_k_reranked", default=5, type=int, help="The maximum number of reranked documents.")
     parser.add_argument("--save_steps", default="", type=str, help="you can save intermediate results.")
-    parser.add_argument("--verify", default=False, action='store_true',)
+    parser.add_argument("--verify", default=True, action='store_true',)
     parser.add_argument(
         "--output_dir",
-        default=None,
+        default="D:/MS/685/Project/cs-685-toc-project/outputs",
         type=str,
-        required=True,
+        # required=True,
         help="The output directory where predictions will be written.",
     )
     return parser
@@ -178,7 +178,7 @@ def main():
     args = parser.parse_args()
 
     ## Set DSP configuration
-    lm = dsp.GPT3(model=args.model_type, api_key="")
+    lm = dsp.GPT3(model=args.model_type, api_key="sk-proj-bOuqUUwJRoxsNmUKWwciT3BlbkFJHDSYrGk8QO75ZHI6GeXb")
     #Probably links to a server hosting 100s of relevant documents
     # rm = dsp.ColBERTv2(url=args.colbert_server)
     kw_config = {'lm' : lm}
@@ -214,7 +214,7 @@ def main():
     #looping over dev, dev is probably list[dicts] idx in the index and ambig_ins is a dict probably
     for idx, ambig_ins in enumerate(tqdm(dev[:n_dev])):
         #cur_demos will have the train set from ASQA apparently
-        print("ques",ambig_ins)
+        print("\n", ambig_ins["question"])
         cur_demos = train.copy()
         if (idx + 1) % 10 == 0:
             print(f"{str(idx +1)} steps")
@@ -232,6 +232,8 @@ def main():
         #set pruning to True if verification is enabled
         do_pruning = args.verify == True
         n_restarts = 0 ; n_expansions = 0
+
+        kw_args_ex.update({'consolidation': False})
 
         #while tree limits have not exceeded
         while n_restarts < args.max_trials and \
@@ -252,7 +254,7 @@ def main():
 
             #get n examples and context from the training set relevant to the current ambig dict in the current node
             qd_example = get_example(args, cur_demos, cur_ins, cur_passages, **kw_args_ex)
-
+            
             #adds the context for the current question to slt_psgs.
             # slt_psgs is part of each node in the tree representing the context for that node.
             toc.slt_psgs += qd_example.context
