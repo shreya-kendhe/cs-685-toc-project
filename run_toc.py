@@ -3,6 +3,7 @@ import json
 import dsp
 import argparse
 from tqdm import tqdm
+from get_snippets import get_snippets
 
 from toc import (
     rerank,
@@ -204,7 +205,7 @@ def main():
             bing_passages = bing_results[idx]
 
         #retrieve relevant passages to the current dict in ambig_ins from bing and colbert
-        all_passages = retrieve_passages(args, ambig_ins, bing_passages=bing_passages)
+        all_passages = get_snippets(ambig_ins["ID"])
         cur_passages = all_passages.copy()
         #create root node of the first root ambig dict
         toc = ToC(root=Node(ambig_ins))
