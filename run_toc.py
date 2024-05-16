@@ -20,7 +20,6 @@ def get_dataset():
     data_path = os.path.join("complexwebquestions_V1_1/ComplexWebQuestions_dev.json")
     data = json.load(open(data_path))
     qa_pairs = []
-    n = 0
     for ins in data:
         question = ins['question']
         answers = [anns['answer'] for anns in ins['answers']]
@@ -32,8 +31,6 @@ def get_dataset():
         # str_disambigs = make_str_disambig(ins['qa_pairs'])
         # entry.update({'disambig' : str_disambigs})
         qa_pairs += [entry]
-        n+=1
-        break
     examples = [dsp.Example(**kw_example) for kw_example in qa_pairs]
     return examples, data
 
@@ -217,6 +214,7 @@ def main():
     #looping over dev, dev is probably list[dicts] idx in the index and ambig_ins is a dict probably
     for idx, ambig_ins in enumerate(tqdm(dev[:n_dev])):
         #cur_demos will have the train set from ASQA apparently
+        print("ques",ambig_ins)
         cur_demos = train.copy()
         if (idx + 1) % 10 == 0:
             print(f"{str(idx +1)} steps")
