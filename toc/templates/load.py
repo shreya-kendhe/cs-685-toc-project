@@ -2,14 +2,14 @@ import dsp
 
 def get_rac_template():
     instructions = " ".join([ 
-        "I will provide ambiguous questions that can have multiple answers based on their different possible interpretations.",
-        "Clarify the given question into several disambiguated questions and provide short factoid answers to each question.",
-        "Subsequently, summarize them into a detailed long-form answer of at least three sentences.",
+        "I will provide complex questions whose answers require multi-hop reasoning.",
+        "Clarify the given question into several sub-questions or disambiguated questions and provide short factoid answers to each question.",
+        "Subsequently, aggregate them into a the final answer that answers the main question.",
         "Here are some examples."
     ])
     desc_disambig = "${the disambiguated pairs of questions and answers, each is separated by a new line.}"
-    desc_subq = "DQ i: ${(i)-th disambiguated question that clarifies the ambiguous question}"
-    desc_suba = "DA i: ${short factoid answers separated by semi-colon (;) to (i)-th disambiguated question, often between 1 and 5 words}"
+    desc_subq = "SQ i: ${(i)-th disambiguated question that clarifies the ambiguous question}"
+    desc_suba = "SA i: ${short factoid answers separated by semi-colon (;) to (i)-th disambiguated question, often between 1 and 5 words}"
     desc_answer = "${a thorough, detailed answer that explains the multiple interpretations of the original question and includes the appropriate disambiguations, at least three sentences.}"
     
     Context = dsp.Type(
@@ -20,7 +20,7 @@ def get_rac_template():
     
     AmbigQuestion = dsp.Type(prefix="Question:", desc="${ambiguous question to be disambiguated}")
     
-    Disambiguations = dsp.Type(prefix="Disambiguations:\n", 
+    Disambiguations = dsp.Type(prefix="Subquestions:\n", 
                             desc="\n".join([desc_disambig, desc_subq, desc_suba]))
     
     Answer = dsp.Type(prefix="Answer:", desc=desc_answer, format=dsp.format_answers)

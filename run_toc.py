@@ -19,11 +19,9 @@ from utils import save_results
 def get_dataset():
     data_path = os.path.join("complexwebquestions_V1_1/ComplexWebQuestions_dev.json")
     data = json.load(open(data_path))
-    print(data[1])
     qa_pairs = []
     n = 0
     for ins in data:
-        print('ins',ins)
         question = ins['question']
         answers = [anns['answer'] for anns in ins['answers']]
 
@@ -31,11 +29,9 @@ def get_dataset():
                  'answer'   : answers,
                  'id'       : ins['ID'],
         }
-        print(entry)
         # str_disambigs = make_str_disambig(ins['qa_pairs'])
         # entry.update({'disambig' : str_disambigs})
         qa_pairs += [entry]
-        print(qa_pairs)
         n+=1
         break
     examples = [dsp.Example(**kw_example) for kw_example in qa_pairs]
@@ -154,13 +150,13 @@ def remove_dup_psgs(passages, contexts, lst_disambigs):
 def get_argparser():
     parser = argparse.ArgumentParser()
     # Required parameters
-    parser.add_argument("--data_dir", default=None, type=str, required=True, help="The input data dir.")
-    parser.add_argument("--data_name", default="ASQA.json", type=str, help="The input data name.")
+    # parser.add_argument("--data_dir", default=None, type=str, required=True, help="The input data dir.")
+    # parser.add_argument("--data_name", default="ASQA.json", type=str, help="The input data name.")
     parser.add_argument("--bing_path", default=None, type=str, help="The bing data path.")
     parser.add_argument("--prefix", default='', type=str, help="The prefix of output files.")
     parser.add_argument("--model_type", default='text-davinci-003', type=str, help="The GPT model type.")
-    parser.add_argument("--openai_key",  default='', type=str, required=True, help="The openai key.")
-    parser.add_argument("--colbert_url", default='', type=str,required=True, help= "The colbert server url.")
+    # parser.add_argument("--openai_key",  default='', type=str, required=True, help="The openai key.")
+    # parser.add_argument("--colbert_url", default='', type=str,required=True, help= "The colbert server url.")
     parser.add_argument("--temperature", default=0.7, type=float, help="The temperature for generation.")
     parser.add_argument("--n_shot", default=5, type=int, help="The number of few-shot examples for in-context learning.")
     parser.add_argument("--n_dev", default=-1, type=int, help="The number of dev examples to run.")
@@ -187,15 +183,15 @@ def main():
     ## Set DSP configuration
     lm = dsp.GPT3(model=args.model_type, api_key="")
     #Probably links to a server hosting 100s of relevant documents
-    rm = dsp.ColBERTv2(url=args.colbert_server)
-    kw_config = {'lm' : lm, 'rm' : rm}
+    # rm = dsp.ColBERTv2(url=args.colbert_server)
+    kw_config = {'lm' : lm}
 
     if args.top_k_reranked > 0:
         kw_config['reranker'] = dsp.SentenceTransformersCrossEncoder()
 
     dsp.settings.configure(**kw_config)
 
-    dev, data = get_dataset(args)
+    dev, data = get_dataset()
     train, asqa_data = get_dataset_ASQA()
     rac_template = get_rac_template()
 
@@ -203,8 +199,8 @@ def main():
     if args.top_k_reranked > 0:
         kw_args_ex['reranker'] = dsp.settings.reranker
 
-    if args.bing_path is not None:
-        bing_results = json.load(open("output_comp.json"))
+    # if args.bing_path is not None:
+    #     bing_results = json.load(open("output_comp.json"))
         # assert len(bing_results) == len(dev)
 
     if args.n_dev < 0:
@@ -226,12 +222,13 @@ def main():
             print(f"{str(idx +1)} steps")
 
         #loads the passages from bing for the current index
-        if args.bing_path is not None:
-            bing_passages = bing_results[idx]
+        # if args.bing_path is not None:
+        #     bing_passages = bing_results[idx]
 
         #retrieve relevant passages to the current dict in ambig_ins from bing and colbert
-        all_passages = get_snippets(ambig_ins["ID"])
-        cur_passages = all_passages.copy()
+        all_passages = get_snippets(ambig_ins["id"])
+        cur_passages = all_passages.copy()  # 100 passages for Azad Kashmir example
+    
         #create root node of the first root ambig dict
         toc = ToC(root=Node(ambig_ins))
         #set pruning to True if verification is enabled
@@ -263,6 +260,7 @@ def main():
             toc.slt_psgs += qd_example.context
 
             #gets the results from the LLM of disambig questions and answers, not sure what is stored in what
+            # Errors out on the line below because API key not present
             qd_result, qd_completions = QD_predict(qd_example, rac_template, sc=False, temperature=args.temperature)
             try:
                 #Try parsing the q/a pairs
