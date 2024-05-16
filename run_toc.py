@@ -178,7 +178,7 @@ def main():
     args = parser.parse_args()
 
     ## Set DSP configuration
-    lm = dsp.GPT3(model=args.model_type, api_key="sk-proj-bOuqUUwJRoxsNmUKWwciT3BlbkFJHDSYrGk8QO75ZHI6GeXb")
+    lm = dsp.GPT3(model=args.model_type, api_key="")
     #Probably links to a server hosting 100s of relevant documents
     # rm = dsp.ColBERTv2(url=args.colbert_server)
     kw_config = {'lm' : lm}
