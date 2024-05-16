@@ -13,11 +13,11 @@ def make_str_disambig(lst_disambig, ambigQA=True):
     
     str_disambigs = ""
     for idx, disambig in enumerate(lst_disambig):
-        str_disambigs += f"\nDQ {idx+1}: {disambig['question']}"
+        str_disambigs += f"\nSQ {idx+1}: {disambig['question']}"
         if ambigQA:
-            str_disambigs += f"\nDA {idx+1}: {disambig['short_answers'][0]}"
+            str_disambigs += f"\nSA {idx+1}: {disambig['short_answers'][0]}"
         else:
-            str_disambigs += f"\nDA {idx+1}: {disambig['answer']}"
+            str_disambigs += f"\nSA {idx+1}: {disambig['answer']}"
     
     return str_disambigs
     
@@ -31,11 +31,11 @@ def parse_disambig(str_disambig):
         if i+1 >= len(lst_disambig):
             continue
         try:
-            assert "DQ" in lst_disambig[i]
-            assert "DA" in lst_disambig[i+1]
+            assert "SQ" in lst_disambig[i]
+            assert "SA" in lst_disambig[i+1]
             
-            question = re.split(r'DQ\s*\d*:', lst_disambig[i])[1]
-            answer = re.split(r'DA\s*\d*:', lst_disambig[i+1])[1]
+            question = re.split(r'SQ\s*\d*:', lst_disambig[i])[1]
+            answer = re.split(r'SA\s*\d*:', lst_disambig[i+1])[1]
             disambigs.append({'question' : question.strip(), 
                             'answer'   : answer.strip()
                             }

@@ -54,7 +54,7 @@ def get_dataset_ASQA():
         }
 
         str_disambigs = make_str_disambig(ins['qa_pairs'])
-        entry.update({'disambig' : str_disambigs})
+        entry.update({'subques' : str_disambigs})
 
         qa_pairs["train"] += [entry]
 
@@ -86,7 +86,7 @@ def get_example(args, train, ins, passages,
 
     #not sure what this is, where does ins.disambig come from no key named disambig in the dataset
     if consolidation:
-        dic_example.update({'disambig' : ins.disambig})
+        dic_example.update({'subques' : ins.disambig})
 
     #returns some datatype representing the context and the n shots
     example = dsp.Example(**dic_example)
@@ -102,7 +102,7 @@ def QD_predict(example: dsp.Example, qd_template,
 
     kw_out = {
             'answer': completions.answer,
-            'disambig': completions.disambig,
+            'subques': completions.disambig,
     }
 
     out_example = example.copy(**kw_out)

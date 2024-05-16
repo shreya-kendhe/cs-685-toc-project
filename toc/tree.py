@@ -34,7 +34,7 @@ class ToC:
         str_disambigs = make_str_disambig(self.valid_qas[:n_outs], ambigQA=False)
         dic_example = {'question': self.root.ins.question,
                        'id'      : self.root.ins.id,
-                       'disambig': str_disambigs,
+                       'subques': str_disambigs,
                        }
         
         return dsp.Example(**dic_example)

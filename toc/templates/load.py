@@ -28,7 +28,7 @@ def get_rac_template():
     dic_instruct = {'instructions': instructions}
     dic_instruct.update({'context': Context()})
     dic_instruct.update({'question': AmbigQuestion()})
-    dic_instruct.update({'disambig': Disambiguations()})
+    dic_instruct.update({'subques': Disambiguations()})
     dic_instruct.update({'answer': Answer()})
     
     rac_template = dsp.Template(**dic_instruct)
