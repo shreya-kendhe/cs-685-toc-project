@@ -304,7 +304,7 @@ def main():
         ac_result, ac_completions = QD_predict(ac_example, rac_template, sc=False)
 
         preds   += [ac_result.answer]
-        outputs += [ac_completions.data[0]]
+        outputs += [{"output": ac_completions.data[0], "stats":[{"nodes": toc.n_nodes, "depth": toc.leaf_depth}]}]
 
         if (idx + 1) in save_steps:
             with open(os.path.join(args.output_dir, f"output_{str(idx+1)}.json"), 'w') as f:
