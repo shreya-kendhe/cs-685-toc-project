@@ -42,6 +42,30 @@ def get_dataset():
     return examples, data
 
 #train set examples, current ambig dict, relevant passages to the current question from bing and colbert
+
+def get_dataset_ASQA():
+    data_path = os.path.join("asqa/ASQA.json")
+    data = json.load(open(data_path))
+    qa_pairs = {}
+    qa_pairs["train"] = []
+    for idx, (id, ins) in enumerate(data["train"].items()):
+        question = ins['ambiguous_question']
+        answers = [anns['long_answer'] for anns in ins['annotations']]
+
+        entry = {'question' : question,
+                 'answer'   : answers,
+                 'id'       : id,
+        }
+
+        str_disambigs = make_str_disambig(ins['qa_pairs'])
+        entry.update({'disambig' : str_disambigs})
+
+        qa_pairs["train"] += [entry]
+
+    train = [dsp.Example(**kw_example) for kw_example in qa_pairs['train']]
+    return train, data
+
+
 def get_example(args, train, ins, passages,
                 reranker=None, consolidation=False):
 
@@ -172,6 +196,7 @@ def main():
     dsp.settings.configure(**kw_config)
 
     dev, data = get_dataset(args)
+    train, asqa_data = get_dataset_ASQA()
     rac_template = get_rac_template()
 
     kw_args_ex = {}
