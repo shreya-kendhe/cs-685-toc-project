@@ -271,7 +271,7 @@ def main():
             except:
                 lst_err += [[idx, toc, qd_result.disambig]]
 
-            if args.verify:
+            if args.verify and len(lst_disambigs):
                 cur_demos = remove_dup_demos(cur_demos, lst_disambigs)
                 cur_passages = remove_dup_psgs(cur_passages, qd_example.context, lst_disambigs)
 
@@ -282,8 +282,7 @@ def main():
                             ver_completion = verify_with_evidence(dsp.settings.lm,
                                                                 toc,
                                                                 disambig,
-                                                                dsp.settings.reranker,
-                                                                all_passages)
+                                                                dsp.settings.reranker)
                             if "True" in ver_completion[0]:
                                 valid_disambigs += [disambig]
                     lst_disambigs = valid_disambigs.copy()
