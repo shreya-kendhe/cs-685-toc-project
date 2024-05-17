@@ -1,14 +1,6 @@
 import re
 import html
 
-def remove_html_tags(text):
-    clean = re.compile('<.*?>')
-    text = html.unescape(text)
-    text = text.replace("\xa0", " ")
-    text = text.replace("\n", " ")
-    
-    return re.sub(clean, '', text)
-
 def make_str_disambig(lst_disambig, ambigQA=True):
     
     str_disambigs = ""
@@ -42,24 +34,5 @@ def parse_disambig(str_disambig):
             ) 
         except:
             continue
-        
-    return disambigs
-
-def old_parse_disambig(str_disambig):
-    lst_disambig = str_disambig.split("\nSub-")    
-    
-    disambigs = []
-    for i in range(0, len(lst_disambig), 2):
-        if i+1 >= len(lst_disambig):
-            continue
-        assert "Question" in lst_disambig[i]
-        assert "Answer" in lst_disambig[i+1]
-        
-        question = re.split(r'Question\s*\d*:', lst_disambig[i])[1]
-        answer = re.split(r'Answer\s*\d*:', lst_disambig[i+1])[1]
-        disambigs.append({'question' : question.strip(), 
-                        'answer'   : answer.strip()
-                        }
-        ) 
         
     return disambigs

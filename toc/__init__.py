@@ -1,4 +1,3 @@
-# from .retrieval.wiki_utils import *
 from .retrieval.combine import *
 from .templates.load import *
 

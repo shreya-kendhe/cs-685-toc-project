@@ -6,7 +6,6 @@ def retrieve(query: str, k: int) -> list[str]:
     """Retrieves passages from the RM for the query and returns the top k passages."""
     if not dsp.settings.rm:
         raise AssertionError("No RM is loaded.")
-    #Call to ColBert returns a dict probably relevant to the passages, next step creates a list of the "long_text"
     passages = dsp.settings.rm(query, k=k)
     passages = [psg.long_text for psg in passages]
     
