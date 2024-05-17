@@ -137,7 +137,6 @@ def remove_dup_psgs(passages, contexts, lst_disambigs):
 
 def get_argparser():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--prefix", default='', type=str, help="The prefix of output files.")
     parser.add_argument("--model_type", default='davinci-002', type=str, help="The GPT model type.")
     parser.add_argument("--openai_key",  default="", type=str, required=False, help="The openai key.")
     parser.add_argument("--temperature", default=0.7, type=float, help="The temperature for generation.")

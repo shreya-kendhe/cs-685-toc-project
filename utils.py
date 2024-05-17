@@ -14,10 +14,10 @@ def save_results(args, data, preds, outputs):
         
     os.makedirs(args.output_dir, exist_ok=True)
     
-    with open(os.path.join(args.output_dir, args.prefix + "preds.json"), 'w') as f:
+    with open(os.path.join(args.output_dir, "preds.json"), 'w') as f:
         json.dump(preds_w_ids, f)
         
-    with open(os.path.join(args.output_dir, args.prefix + "outputs.json"), 'w') as f:
+    with open(os.path.join(args.output_dir, "outputs.json"), 'w') as f:
         json.dump(outputs_w_ids, f)
         
 
